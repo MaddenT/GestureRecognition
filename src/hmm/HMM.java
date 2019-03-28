@@ -3,7 +3,6 @@ package hmm;
 import java.util.ArrayList;
 
 public class HMM {
-	
 	private void normalizeData(ArrayList<ArrayList<ArrayList<Integer>>> data) {
 		ArrayList<ArrayList<ArrayList<Double>>> normalizedData = new ArrayList<ArrayList<ArrayList<Double>>>();
 		//Iterate through all of the characters in the list
