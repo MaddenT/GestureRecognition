@@ -2,8 +2,17 @@ package hmm;
 
 import java.util.ArrayList;
 
+import data.DataReader;
+
 public class HMM {
-	private void normalizeData(ArrayList<ArrayList<ArrayList<Integer>>> data) {
+	
+	private ArrayList<ArrayList<ArrayList<Double>>> data;
+	
+	public HMM(ArrayList<ArrayList<ArrayList<Integer>>> data) {
+		this.data = normalizeData(data);
+	}
+	
+	private ArrayList<ArrayList<ArrayList<Double>>> normalizeData(ArrayList<ArrayList<ArrayList<Integer>>> data) {
 		ArrayList<ArrayList<ArrayList<Double>>> normalizedData = new ArrayList<ArrayList<ArrayList<Double>>>();
 		//Iterate through all of the characters in the list
 		for (ArrayList<ArrayList<Integer>> character : data) {
@@ -45,12 +54,23 @@ public class HMM {
 			//Add the normalized character to the normalized dataset
 			normalizedData.add(normalizedCharacter);
 		}
+		return normalizedData;
 	}
-
+	
+	public ArrayList<ArrayList<ArrayList<Double>>> getData() {
+		return this.data;
+	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		HMM hMM = new HMM();
-		hMM.normalizeData(null);
+		DataReader readData = new DataReader();
+		HMM hMM = new HMM(readData.readIn());
+		ArrayList<ArrayList<ArrayList<Double>>> data = hMM.getData();
+		for(ArrayList<ArrayList<Double>> chara : data) {
+			for (ArrayList<Double> point : chara) {
+				System.out.println(point.toString());
+			}
+		}
 	}
 
 }
