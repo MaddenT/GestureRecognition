@@ -1,15 +1,26 @@
 package hmm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import data.DataReader;
 
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.stat.StatUtils;
+import org.apache.commons.math3.stat.correlation.Covariance;
 public class HMM {
 	
 	private ArrayList<ArrayList<ArrayList<Double>>> data;
+	private int numberOfStates;
+	private ArrayList<State> states;
+	private double[][] transitionMatrix;
 	
-	public HMM(ArrayList<ArrayList<ArrayList<Integer>>> data) {
+	public HMM(ArrayList<ArrayList<ArrayList<Integer>>> data, int numberOfStates) {
 		this.data = normalizeData(data);
+		this.numberOfStates = numberOfStates;
+		this.states = new ArrayList<State>();
+		initializeStates();
+		initializeTransitions();
 	}
 	
 	private ArrayList<ArrayList<ArrayList<Double>>> normalizeData(ArrayList<ArrayList<ArrayList<Integer>>> data) {
@@ -57,6 +68,79 @@ public class HMM {
 		return normalizedData;
 	}
 	
+	private void initializeStates() {
+		int totalPoints = 0;
+		for (ArrayList<ArrayList<Double>> chara : data) {
+			totalPoints += chara.size();
+		}
+		int pointsPerState = (int) totalPoints/numberOfStates;
+		int pointsPerStateInCharacter = (int) pointsPerState/data.size();
+
+		for (int currentState = 0 ; currentState < numberOfStates ; currentState++) {
+			ArrayList<Double> xPointsInState = new ArrayList<Double>();
+			ArrayList<Double> yPointsInState = new ArrayList<Double>();
+			for (ArrayList<ArrayList<Double>> chara : data) {
+				for (int boundCounter = currentState*pointsPerStateInCharacter ; 
+						boundCounter < pointsPerStateInCharacter + currentState*pointsPerStateInCharacter; 
+						boundCounter ++) {
+					if (boundCounter >= chara.size()) {
+						break;
+					}
+					xPointsInState.add(chara.get(boundCounter).get(0));
+					yPointsInState.add(chara.get(boundCounter).get(1));
+				}
+			}
+			
+			double[] xPointsInStateArray = xPointsInState.stream().mapToDouble(d -> d).toArray();
+			double[] yPointsInStateArray = yPointsInState.stream().mapToDouble(d -> d).toArray();
+			
+			double[][] xyPointsInStateArray = new double[xPointsInStateArray.length][2];
+			
+			for (int pointCount = 0; pointCount < xPointsInStateArray.length; pointCount++) {
+				xyPointsInStateArray[pointCount][0] = xPointsInStateArray[pointCount];
+				xyPointsInStateArray[pointCount][1] = yPointsInStateArray[pointCount];
+			}
+			
+			double xMean = StatUtils.mean(xPointsInStateArray);
+			double yMean = StatUtils.mean(yPointsInStateArray);
+			ArrayList<Double> means = new ArrayList<Double>();
+			means.add(xMean);
+			means.add(yMean);
+			
+			Covariance covarianceObj = new Covariance(xyPointsInStateArray);
+			RealMatrix covariance = covarianceObj.getCovarianceMatrix();
+			
+			states.add(new State(means, covariance, 1/numberOfStates));
+		}
+	}
+	
+	private void initializeTransitions() {
+		double[] transitionOne = new double[4];
+		transitionOne[0] = 0.75;
+		transitionOne[1] = 0.25;
+		transitionOne[2] = 0.0;
+		transitionOne[3] = 0.0;
+		double[] transitionTwo = new double[4];
+		transitionTwo[0] = 0.0;
+		transitionTwo[1] = 0.75;
+		transitionTwo[2] = 0.25;
+		transitionTwo[3] = 0.0;
+		double[] transitionThree = new double[4];
+		transitionThree[0] = 0.0;
+		transitionThree[1] = 0.0;
+		transitionThree[2] = 0.75;
+		transitionThree[3] = 0.25;
+		double[] transitionFour = new double[4];
+		transitionFour[0] = 0.0;
+		transitionFour[1] = 0.0;
+		transitionFour[2] = 0.0;
+		transitionFour[3] = 1.0;
+		
+		double[][] transitionMatrix = {transitionOne, transitionTwo, transitionThree, transitionFour};
+		this.transitionMatrix = transitionMatrix;
+	}
+	
+	
 	public ArrayList<ArrayList<ArrayList<Double>>> getData() {
 		return this.data;
 	}
@@ -64,13 +148,9 @@ public class HMM {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		DataReader readData = new DataReader();
-		HMM hMM = new HMM(readData.readIn());
+		HMM hMM = new HMM(readData.readIn(), 4);
 		ArrayList<ArrayList<ArrayList<Double>>> data = hMM.getData();
-		for(ArrayList<ArrayList<Double>> chara : data) {
-			for (ArrayList<Double> point : chara) {
-				System.out.println(point.toString());
-			}
+		hMM.initializeStates();
 		}
 	}
 
-}
