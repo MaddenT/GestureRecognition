@@ -1,5 +1,7 @@
 package hmm;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -20,12 +22,13 @@ public class HMM {
 	private double[][] transitionMatrix;
 	
 	public HMM(ArrayList<ArrayList<ArrayList<Integer>>> data, int numberOfStates) {
-		long startTime = System.nanoTime();
+		Instant start = Instant.now();
 		this.data = normalizeData(data);
 		System.out.println("Data normalized");
 		this.numberOfStates = numberOfStates;
 		this.states = new ArrayList<State>();
 		initializeStates();
+		System.out.println("States initialized");
 		initializeTransitions();
 		train();
 		for (int i = 0 ; i < numberOfStates ; i++) {
@@ -34,9 +37,8 @@ public class HMM {
 			System.out.println("Cov: " + states.get(i).getCov().toString());
 			System.out.println("Weight: " + states.get(i).getWeight());
 		}
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime); 
-		System.out.println("Exit, training took: " + duration + " seconds.");
+		Instant end = Instant.now();
+		System.out.println("Exit, training took: " + Duration.between(start, end) + " seconds.");
 	}
 	
 	private ArrayList<ArrayList<ArrayList<Double>>> normalizeData(ArrayList<ArrayList<ArrayList<Integer>>> data) {
@@ -276,17 +278,33 @@ public class HMM {
 			
 			try {
 				double logLikelihood = logLikelihood();
+				//System.out.println(logLikelihood);
+				if (iterations % 200 == 0) {
+					System.out.println("Iteration #: " + iterations);
+					System.out.println("LogLL: " + logLikelihood);
+					for (int i = 0; i < numberOfStates ; i++) {
+						System.out.println("State #: "  + i);
+						System.out.println("Means: "  + states.get(i).getMeans().toString());
+						System.out.println("Cov: "  + states.get(i).getCov().toString());
+						System.out.println("Weight: "  + states.get(i).getWeight());
+					}
+					System.out.println("*********************************************");
+				}
 				if (logLikelihood < prevProb) {
 					for (int i = 0 ; i < numberOfStates ; i++) {
 						states.get(i).setCov(prevCov.get(i));
 						states.get(i).setMeans(prevMeans.get(i));
 						states.get(i).setWeight(prevWeight.get(i));
 					}
-					System.out.println(iterations);
+					System.out.println("LogLL: " + logLikelihood);
+					System.out.println("Iterations: " + (iterations + 1));
 					run = false;
 				} else {
 					prevProb = logLikelihood;
 					for (int i = 0; i < numberOfStates ; i++) {
+						//System.out.println("Means: "  + states.get(i).getMeans().toString());
+						//System.out.println("Cov: "  + states.get(i).getCov().toString());
+						//System.out.println("Weight: "  + states.get(i).getWeight());
 						prevCov.set(i, states.get(i).getCov());
 						prevMeans.set(i, states.get(i).getMeans());
 						prevWeight.set(i, states.get(i).getWeight());

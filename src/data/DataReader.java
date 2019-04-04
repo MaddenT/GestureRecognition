@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -15,9 +16,15 @@ public class DataReader {
 		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\zero");
 		String[] files = folder.list();
 		
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		for (int i = 0; i < 10; i++) {
+			//indexes.add(getRandNum(indexes));
+			indexes.add(i);
+		}
+		System.out.println(indexes.toString());
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
-		for (String file : files) {
-			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\zero\\" + file);
+		for (int index : indexes) {
+			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\zero\\" + files[index]);
 			ArrayList<ArrayList<Integer>> chara = new ArrayList<ArrayList<Integer>>();
 			try {
 				Scanner scan = new Scanner(f);
@@ -38,21 +45,26 @@ public class DataReader {
 			}
 			data.add(chara);
 		}	
-		System.out.println("Data read");
+		System.out.println("Data read, size = " + data.size());
 		return data;
 	}
 	
-	public void test() {
-		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\zero");
-		String[] files = folder.list();
-		System.out.println(files[0]);
+	public int getRandNum(ArrayList<Integer> randList) {
+		Random rand = new Random();		
+		int randNum = rand.nextInt((1000-10) + 1) + 10;
+
+		if (!randList.contains(randNum)) {
+			return randNum;
+		} else {
+			return getRandNum(randList);
+		}
+		
 	}
-	
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		DataReader readData = new DataReader();
 		ArrayList<ArrayList<ArrayList<Integer>>> data = readData.readIn();
-		System.out.println(data.size());
 		//readData.test();
 	}
 
