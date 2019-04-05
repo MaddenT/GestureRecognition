@@ -163,6 +163,7 @@ public class HMM {
 		ArrayList<Double> prevWeight = new ArrayList<Double>();
 		double prevProb = logLikelihood();
 		
+		
 		for(int i = 0 ; i < numberOfStates ; i++) {
 			prevCov.add(states.get(i).getCov());
 			prevMeans.add(states.get(i).getMeans());
@@ -279,16 +280,16 @@ public class HMM {
 			try {
 				double logLikelihood = logLikelihood();
 				//System.out.println(logLikelihood);
-				if (iterations % 200 == 0) {
+				if (iterations % 10 == 0) {
 					System.out.println("Iteration #: " + iterations);
-					System.out.println("LogLL: " + logLikelihood);
-					for (int i = 0; i < numberOfStates ; i++) {
-						System.out.println("State #: "  + i);
-						System.out.println("Means: "  + states.get(i).getMeans().toString());
-						System.out.println("Cov: "  + states.get(i).getCov().toString());
-						System.out.println("Weight: "  + states.get(i).getWeight());
-					}
-					System.out.println("*********************************************");
+					//System.out.println("LogLL: " + logLikelihood);
+					//for (int i = 0; i < numberOfStates ; i++) {
+					//	System.out.println("State #: "  + i);
+					//	System.out.println("Means: "  + states.get(i).getMeans().toString());
+					//	System.out.println("Cov: "  + states.get(i).getCov().toString());
+					//	System.out.println("Weight: "  + states.get(i).getWeight());
+					//}
+					//System.out.println("*********************************************");
 				}
 				if (logLikelihood < prevProb) {
 					for (int i = 0 ; i < numberOfStates ; i++) {
@@ -329,14 +330,15 @@ public class HMM {
 			double logSum = 0.0;
 			for (ArrayList<Double> point : chara) {
 				double tempSum = 0.0;
-				for (State state : states) {
-					tempSum = tempSum + state.getWeight() * (new MultivariateNormalDistribution(state.getMeansArray(), 
-							state.getCovArray())
-							.density(point.stream().mapToDouble(d -> d).toArray()));
-				}
+					for (State state : states) {
+						tempSum = tempSum + state.getWeight() * (new MultivariateNormalDistribution(state.getMeansArray(), 
+								state.getCovArray())
+								.density(point.stream().mapToDouble(d -> d).toArray()));
+					}	
 				if (tempSum == 0.0) {
 					tempSum = 0.0000001;
 				}
+
 				logSum = logSum + (new Log().value(tempSum));
 			}
 			logSums.add(logSum);
@@ -352,8 +354,9 @@ public class HMM {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		DataReader readData = new DataReader();
-		HMM hMM = new HMM(readData.readIn(), 4);
+		//SimplifyCharacter sp = new SimplifyCharacter();
+		DataReader dr = new DataReader();
+		HMM hMM = new HMM(dr.readIn(), 4);
 		//ArrayList<ArrayList<ArrayList<Double>>> data = hMM.getData();
 		}
 	}
