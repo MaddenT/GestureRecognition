@@ -13,18 +13,17 @@ import java.util.stream.Stream;
 
 public class DataReader {
 	public ArrayList<ArrayList<ArrayList<Integer>>> readIn() {
-		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\zero");
+		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\all-training\\zero");
 		String[] files = folder.list();
 		
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 220; i++) {
 			//indexes.add(getRandNum(indexes));
 			indexes.add(i);
 		}
-		System.out.println(indexes.toString());
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
 		for (int index : indexes) {
-			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\zero\\" + files[index]);
+			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\all-training\\zero\\" + files[index]);
 			ArrayList<ArrayList<Integer>> chara = new ArrayList<ArrayList<Integer>>();
 			try {
 				Scanner scan = new Scanner(f);
