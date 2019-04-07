@@ -17,6 +17,10 @@ public class State {
 		this.weight = weight;
 	}
 	
+	public State (String[] stateData) {
+		loadState(stateData);
+	}
+	
 	public RealMatrix getCov() {
 		return covariance;
 	}
@@ -52,6 +56,39 @@ public class State {
 	
 	public void setWeight(double weight) {
 		this.weight = weight;
+	}
+	
+	public String getString() {
+		String output = "[" + means.toString() + "%" + "{" + Double.toString(covariance.getRow(0)[0]) + "," + Double.toString(covariance.getRow(0)[1])
+				+ "}&{" + Double.toString(covariance.getRow(1)[0]) + "," + Double.toString(covariance.getRow(1)[1]) + "}%" 
+				+ Double.toString(weight) + "]";
+		return output;
+	}
+	
+	private void loadState(String[] stateData) {
+		String[] tempMeans = stateData[0].replaceAll("\\[", "").replaceAll("\\]", "").split(",");
+		ArrayList<Double> loadedMeans = new ArrayList<Double>();
+		loadedMeans.add(Double.parseDouble(tempMeans[0]));
+		loadedMeans.add(Double.parseDouble(tempMeans[1]));
+		this.means = loadedMeans;
+		
+		String[] tempCovariance = stateData[1].split("&");
+		String[] tempArray1 = tempCovariance[0].substring(1, tempCovariance[0].length() - 1).split(",");
+		String[] tempArray2 = tempCovariance[1].substring(1, tempCovariance[1].length() - 1).split(",");
+		
+		double[] doubleArray1 = new double[2];
+		double[] doubleArray2 = new double[2];
+		
+		for (int i = 0 ; i < 2 ; i++) {
+			doubleArray1[i] = Double.parseDouble(tempArray1[i]);
+			doubleArray2[i] = Double.parseDouble(tempArray2[i]);
+		}
+		
+		double[][] tempCovarianceArray = {doubleArray1, doubleArray2};
+		RealMatrix tempRealMatrix = MatrixUtils.createRealMatrix(tempCovarianceArray);
+		this.covariance = tempRealMatrix;
+		
+		this.weight = Double.parseDouble(stateData[2]);
 	}
 	
 	public static void main(String[] args) {
