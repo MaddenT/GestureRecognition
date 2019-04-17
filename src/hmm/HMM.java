@@ -60,48 +60,27 @@ public class HMM {
 		ArrayList<ArrayList<ArrayList<Double>>> normalizedData = new ArrayList<ArrayList<ArrayList<Double>>>();
 		//Iterate through all of the characters in the list
 		for (ArrayList<ArrayList<Integer>> character : data) {
-			int sumX = 0;
-			int sumY = 0;
-			//Find the sum of all of the points in each character
-			for (ArrayList<Integer> point : character) {
-				sumX += point.get(0);
-				sumY += point.get(1);
-			}
-			//Find the average of all the points in each character
-			float meanX = sumX/character.size();
-			float meanY = sumY/character.size();
-
-			//Instantiate the variable to hold the summation used in a standard
-			//deviation calculation
-			int stdNumeratorX = 0;
-			int stdNumeratorY = 0;
-			/*Sum the numbers in the numerator of the std deviation formula.
-			Multiply the number by itself to square it rather than using Math.pow
-			since machine commands are O(1)*/
-			for (ArrayList<Integer> point : character) {
-				stdNumeratorX += ((point.get(0) - meanX) * (point.get(0) - meanX));
-				stdNumeratorY += ((point.get(1) - meanY) * (point.get(1) - meanY));
-			}
-			
-			//Calculate the standard deviation for x and y
-			double stdX = Math.sqrt(stdNumeratorX / character.size());
-			double stdY = Math.sqrt(stdNumeratorY / character.size());
-			
-			//Normalize the points and add them to a new character
-			ArrayList<ArrayList<Double>> normalizedCharacter = new ArrayList<ArrayList<Double>>();
-			for (ArrayList<Integer> point : character) {
-				ArrayList<Double> normalizedPoint = new ArrayList<Double>();
-				normalizedPoint.add(((point.get(0) - meanX) / stdX));
-				normalizedPoint.add(((point.get(1) - meanY) / stdY));
-				normalizedCharacter.add(normalizedPoint);
-			}
-			//Add the normalized character to the normalized dataset
+			ArrayList<ArrayList<Double>> normalizedCharacter = normalizeCharacter(character);
 			normalizedData.add(normalizedCharacter);
 		}
 		return normalizedData;
 	}
 	
 	private ArrayList<ArrayList<Double>> normalizeCharacter(ArrayList<ArrayList<Integer>> character) {
+		//ArrayList<ArrayList<Integer>> character = new ArrayList<ArrayList<Integer>>();
+		
+		//int pointCount = 0;
+		//boolean pointsCollect = true;
+		//while (pointsCollect) {
+			//try {
+				//character.add(origCharacter.get(pointCount * 10));
+				//pointCount += 1;
+			//} catch (Exception e) {
+				//character.add(origCharacter.get(origCharacter.size() - 1));
+				//pointsCollect = false;
+		//	}
+		//}
+		
 		//Iterate through all of the characters in the list
 		int sumX = 0;
 		int sumY = 0;
@@ -216,10 +195,6 @@ public class HMM {
 		this.transitionMatrix = transitionMatrix;
 	}
 	
-	
-	
-	
-	
 	public ArrayList<ArrayList<ArrayList<Double>>> getData() {
 		return this.trainingData;
 	}
@@ -227,7 +202,9 @@ public class HMM {
 	
 	public double evaluate(ArrayList<ArrayList<Integer>> character) {
 		ArrayList<ArrayList<Double>> points = normalizeCharacter(character);
+ 		
 		int numberOfPoints = points.size();
+		//System.out.println(numberOfPoints);
 		double[][] a = new double[this.numberOfStates][numberOfPoints];
 		double[][] b = new double[this.numberOfStates][numberOfPoints];
 		double counter = 0.0;
@@ -259,6 +236,7 @@ public class HMM {
 				a[s][i+1] = sumA * (new MultivariateNormalDistribution(this.states.get(s).getMeansArray(), 
 						this.states.get(s).getCovArray())
 						.density(points.get(i + 1).stream().mapToDouble(d -> d).toArray()));
+			
 			}
 		}
 		
@@ -269,6 +247,7 @@ public class HMM {
 					sumB = sumB + (this.transitionMatrix[s][j] * (new MultivariateNormalDistribution(this.states.get(j).getMeansArray(), 
 							this.states.get(j).getCovArray())
 							.density(points.get(numberOfPoints-i-1).stream().mapToDouble(d -> d).toArray()))) * b[j][numberOfPoints-i-1];
+				
 				}
 				b[s][numberOfPoints-i-2] = sumB;
 			}
@@ -287,7 +266,7 @@ public class HMM {
 		// TODO Auto-generated method stub
 		//SimplifyCharacter sp = new SimplifyCharacter();
 		DataReader dr = new DataReader();
-		HMM hMM = new HMM(dr.readInTraining("one"), 2, "one");
+		HMM hMM = new HMM(dr.readInTraining("one", true), 2, "one");
 		//System.out.println(hMM.evaluate(dr.readInTesting("one").get(0)));
 		//ArrayList<ArrayList<ArrayList<Double>>> data = hMM.getData();
 		}
