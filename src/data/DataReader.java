@@ -15,18 +15,55 @@ import hmm.State;
 
 public class DataReader {
 	public ArrayList<ArrayList<ArrayList<Integer>>> readInTraining(String charString) {
-		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\all-training\\" + charString);
+		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\MNIST\\" + charString);
 		String[] files = folder.list();
 		
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
-		for (int i = 0; i < 220; i++) {
+		for (int i = 0; i < files.length; i++) {
 			//indexes.add(getRandNum(indexes));
 			indexes.add(i);
 		}
 
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
 		for (int index : indexes) {
-			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\all-training\\" + charString + "\\" + files[index]);
+			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\MNIST\\" + charString + "\\" + files[index]);
+			ArrayList<ArrayList<Integer>> chara = new ArrayList<ArrayList<Integer>>();
+			try {
+				Scanner scan = new Scanner(f);
+				while(scan.hasNextLine()) {
+					String[] x = scan.nextLine().split(" ");
+					if (!x[0].equals("\"x\"")) {
+						ArrayList<Integer> point = new ArrayList<Integer>();
+						point.add(Integer.parseInt(x[0]));
+						point.add(Integer.parseInt(x[1]));
+						chara.add(point);
+					}
+				}
+				scan.close();
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			data.add(chara);
+		}	
+		//System.out.println("Data read, size = " + data.size());
+		return data;
+	}
+	
+	public ArrayList<ArrayList<ArrayList<Integer>>> readInTraining(String charString, boolean isHMM) {
+		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\MNIST\\" + charString);
+		String[] files = folder.list();
+		
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		for (int i = 0; i < 59; i++) {
+			//indexes.add(getRandNum(indexes));
+			indexes.add(i);
+		}
+
+		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
+		for (int index : indexes) {
+			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\MNIST\\" + charString + "\\" + files[index]);
 			ArrayList<ArrayList<Integer>> chara = new ArrayList<ArrayList<Integer>>();
 			try {
 				Scanner scan = new Scanner(f);
@@ -52,9 +89,10 @@ public class DataReader {
 	}
 	
 	public ArrayList<ArrayList<ArrayList<Integer>>> readInTesting(String charString) {
-		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\testing\\" + charString);
+		File folder = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\MNISTTesting\\" + charString);
 		String[] files = folder.list();
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		//files.length
 		for (int i = 0; i < files.length; i++) {
 			//indexes.add(getRandNum(indexes));
 			indexes.add(i);
@@ -62,7 +100,7 @@ public class DataReader {
 
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
 		for (int index : indexes) {
-			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\testing\\" + charString + "\\" + files[index]);
+			File f = new File("C:\\Users\\madde\\git\\GestureRecognition\\src\\resources\\training-data\\MNISTTesting\\" + charString + "\\" + files[index]);
 			ArrayList<ArrayList<Integer>> chara = new ArrayList<ArrayList<Integer>>();
 			try {
 				Scanner scan = new Scanner(f);
